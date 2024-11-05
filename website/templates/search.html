@@ -1,26 +1,21 @@
+{% extends "base.html" %}
+{% block title %}課程查詢{% endblock %}
+{% block content %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>課程查詢</title>
-</head>
-<body>
-    <h1>課程查詢</h1>
-    <form method="POST">
+
+<h1 align="center">課程查詢</h1>
+    <form method="POST" align="center">
         <input type="text" name="search_query" placeholder="輸入課程名稱或代號">
         <button type="submit">查詢</button>
     </form>
 
-    {% if students %}
-        <h2>Search Results:</h2>
-        <ul>
-            {% for student in students %}
-                <li>{{ student.name }} ({{ student.account }})</li>
-            {% endfor %}
+    {% if student %}
+        <h2 align="center">Search Results:</h2>
+        <ul align="center">
+            
+            {{ student.name }} ({{ student.account }})
+            
         </ul>
-    {% elif request.method == "POST" %}
-        <p>No results found.</p>
     {% endif %}
-</body>
-</html>
+
+{% endblock %}
