@@ -50,4 +50,15 @@ classes = [
 cur.executemany(
     "INSERT INTO classes VALUES (?, ?, ?, ?, ?, ?)", classes
 )
+
+enrollments = [
+    (1, 1, 1),
+    (2, 1, 2),
+    (3, 2, 3),
+    (4, 3, 4),
+    (5, 3, 5),
+]
+cur.executemany(
+    "INSERT INTO enrollments VALUES (?, ?, ?)", enrollments
+)
 con.commit()
