@@ -18,13 +18,14 @@ def search():
     theClass = None
     if request.method == "POST":
         numberOrName = request.form.get("search_query")
-        if re.match(r'^\d+$', numberOrName):
-            theClass = Classes.query.filter_by(number=numberOrName).first()
-        else:
-            theClass = Classes.query.filter_by(name=numberOrName).first()   
+        if(numberOrName):
+            if re.match(r'^\d+$', numberOrName):
+                theClass = Classes.query.filter_by(number=numberOrName).first()
+            else:
+                theClass = Classes.query.filter_by(name=numberOrName).first()   
 
 
-    return render_template("search.html", theClass=theClass, user=current_user)
+    return render_template("search.html", theClass=theClass, numberOrName=numberOrName,user=current_user)
 
 
 @views.route('/timetable')
