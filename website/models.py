@@ -26,7 +26,7 @@ class Classes(db.Model, UserMixin):
     __tablename__ = "classes"
 
 
-    def __init__(self, id, name, teacher, classroom, time):
+    def __init__(self, id, number, name, teacher, classroom, time):
 
         self.id = id
         self.number = number
