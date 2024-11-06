@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from .models import Student, Classes,Enrollment
 from . import db
 from datetime import datetime
-import os, sys
+import os, sys, re
 
 views = Blueprint("views", __name__)
 
@@ -13,15 +13,19 @@ def home():
     return render_template("home.html", user=current_user)
 
 @views.route("/search", methods=["GET", "POST"])
-@login_required
 def search():
-    account = ""
-    student = None
+    numberOrName = ""
+    theClass = None
     if request.method == "POST":
-        account = request.form.get("search_query")
-        student = Student.query.filter_by(account=account).first()
+        numberOrName = request.form.get("search_query")
+        if re.match(r'^\d+$', numberOrName):
+            theClass = Classes.query.filter_by(number=numberOrName).first()
+        else:
+            theClass = Classes.query.filter_by(name=numberOrName).first()   
 
-    return render_template("search.html", student=student, account=account,user=current_user)
+
+    return render_template("search.html", theClass=theClass, user=current_user)
+
 
 @views.route('/timetable')
 @login_required
@@ -33,3 +37,4 @@ def timetable():
     classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
     
     return render_template('timetable.html', classes=classes, user = current_user)
+

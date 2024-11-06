@@ -25,14 +25,18 @@ class Student(db.Model, UserMixin):
 class Classes(db.Model, UserMixin):
     __tablename__ = "classes"
 
+
     def __init__(self, id, name, teacher, classroom, time):
+
         self.id = id
+        self.number = number
         self.name = name
         self.teacher = teacher
         self.classroom = classroom
         self.time = time
 
     id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     teacher = db.Column(db.String(50), nullable=False)
     classroom = db.Column(db.String(50), nullable=False)

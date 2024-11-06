@@ -9,13 +9,16 @@
         <button type="submit">查詢</button>
     </form>
 
-    {% if student %}
-        <h2 align="center">Search Results:</h2>
-        <ul align="center">
-            
-            {{ student.name }} ({{ student.account }})
-            
-        </ul>
+    {% if theClass %}
+        <h2 align="center">課程資料:</h2>
+        <ul align="center">{{theClass.number}} {{theClass.name}} {{theClass.teacher}} {{theClass.classroom}} {{theClass.startTime}}~{{theClass.endTime}}</ul>    
     {% endif %}
+    <!-- <form>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">課程查詢</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" name="search_query" placeholder="輸入課程名稱或代號">
+        </div>
+        <button type="submit" class="btn btn-primary">查詢</button>
+    </form> -->
 
 {% endblock %}
