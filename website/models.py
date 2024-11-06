@@ -25,8 +25,9 @@ class Student(db.Model, UserMixin):
 class Classes(db.Model):
     __tablename__ = "classes"
 
-    def __init__(self, id, name, teacher, classroom, startTime, endTime):
+    def __init__(self, id,number, name, teacher, classroom, startTime, endTime):
         self.id = id
+        self.number = number
         self.name = name
         self.teacher = teacher
         self.classroom = classroom
@@ -34,6 +35,7 @@ class Classes(db.Model):
         self.endTime = endTime
 
     id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     teacher = db.Column(db.String(50), nullable=False)
     classroom = db.Column(db.String(50), nullable=False)
