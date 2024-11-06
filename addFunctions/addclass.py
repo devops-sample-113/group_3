@@ -71,4 +71,5 @@ enrollments = [
 cur.executemany(
     "INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)", enrollments
 )
+
 con.commit()
