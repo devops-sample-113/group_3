@@ -22,7 +22,7 @@ class Student(db.Model, UserMixin):
     def __repr__(self):
         return f"id: {self.student_id}, email: {self.account}, name: {self.name}"
 
-class Classes(db.Model):
+class Classes(db.Model, UserMixin):
     __tablename__ = "classes"
 
     def __init__(self, id, name, teacher, classroom, startTime, endTime):
@@ -39,3 +39,18 @@ class Classes(db.Model):
     classroom = db.Column(db.String(50), nullable=False)
     startTime = db.Column(db.String(50), nullable=False)
     endTime = db.Column(db.String(50), nullable=False)
+
+class Enrollment(db.Model, UserMixin):
+    __tablename__ = "enrollments"
+
+    def __init__(self, id, student_id, class_id):
+        self.id = id
+        self.student_id = student_id
+        self.class_id = class_id
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
+
+    student = db.relationship('Student', backref='enrollments', lazy=True)
+    classes = db.relationship('Classes', backref='enrollments', lazy=True)
