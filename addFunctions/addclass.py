@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import time
 
 # con = sqlite3.connect("../instance/database.db")
 con = sqlite3.connect("instance/database.db")
@@ -47,6 +48,6 @@ classes = [
     ),
 ]
 cur.executemany(
-    "INSERT INTO classes VALUES (?, ?, ?, ?, ?)", classes
+    "INSERT INTO classes VALUES (?, ?, ?, ?, ?, ?)", classes
 )
 con.commit()
