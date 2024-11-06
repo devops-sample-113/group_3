@@ -79,6 +79,7 @@ def timetable():
     student_id = current_user.student_id
     enrollments = Enrollment.query.filter_by(student_id=student_id).all()
     classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
+    
     return render_template('timetable.html', classes=classes, user = current_user)
 
 @views.route('/add_class', methods=["GET", "POST"])
@@ -90,6 +91,7 @@ def add_class():
     can_add, message = can_add_course(student_id, class_number)
     if not can_add:
         flash(message, "danger")
+
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
     new_class = Classes.query.filter_by(number=class_number).first()
@@ -97,6 +99,7 @@ def add_class():
     no_conflict, message = check_time_conflict(student_id, new_class)
     if not no_conflict:
         flash(message, "danger")
+
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
     new_enrollment = Enrollment(student_id=student_id, class_id=new_class.id)
@@ -104,4 +107,5 @@ def add_class():
     db.session.commit()
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
+
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
