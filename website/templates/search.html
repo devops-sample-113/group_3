@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}課程查詢{% endblock %}
+{% block content %}
+
+
+<h1 align="center">課程查詢</h1>
+    <form method="POST" align="center">
+        <input type="text" name="search_query" placeholder="輸入課程名稱或代號">
+        <button type="submit">查詢</button>
+    </form>
+
+    {% if student %}
+        <h2 align="center">Search Results:</h2>
+        <ul align="center">
+            
+            {{ student.name }} ({{ student.account }})
+            
+        </ul>
+    {% endif %}
+
+{% endblock %}
