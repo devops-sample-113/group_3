@@ -9,14 +9,18 @@
             <th style="padding: 10px; text-align: center;">課程名稱</th>
             <th style="padding: 10px; text-align: center;">老師</th>
             <th style="padding: 10px; text-align: center;">教室</th>
+            <th style="padding: 10px; text-align: center;">星期</th>
             <th style="padding: 10px; text-align: center;">節次</th>
+            <th style="padding: 10px; text-align: center;">學分</th>
         </tr>
         {% for class in classes %}
         <tr>
             <td style="padding: 10px; text-align: center;">{{ class.name }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.teacher }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.classroom }}</td>
+            <td style="padding: 10px; text-align: center;">{{ class.date }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.time }}</td>
+            <td style="padding: 10px; text-align: center;">{{ class.credit }}</td>
         </tr>
         {% endfor %}
     </table>

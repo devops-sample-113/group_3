@@ -26,31 +26,34 @@ class Classes(db.Model, UserMixin):
     __tablename__ = "classes"
 
 
-    def __init__(self, id, number, name, teacher, classroom, time):
+    def __init__(self, id, number, name, teacher, classroom, date, time, credit):
 
         self.id = id
         self.number = number
         self.name = name
         self.teacher = teacher
         self.classroom = classroom
+        self.date = date
         self.time = time
+        self.credit = credit
 
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     teacher = db.Column(db.String(50), nullable=False)
     classroom = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.String(50), nullable=False)
     time = db.Column(db.String(50), nullable=False)
+    credit = db.Column(db.Integer, nullable=False)
 
 class Enrollment(db.Model, UserMixin):
     __tablename__ = "enrollments"
 
-    def __init__(self, id, student_id, class_id):
-        self.id = id
+    def __init__(self, student_id, class_id):
         self.student_id = student_id
         self.class_id = class_id
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
 
