@@ -23,7 +23,7 @@ def search():
 
     return render_template("search.html", student=student, account=account,user=current_user)
 
-@views.route('/timetable', methods=["GET", "POST"])
+@views.route('/timetable')
 @login_required
 def timetable():
     student_id = current_user.student_id
