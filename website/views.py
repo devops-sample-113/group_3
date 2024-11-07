@@ -19,7 +19,7 @@ def search():
     if request.method == "POST":
         numberOrName = request.form.get("search_query")
         if(numberOrName):
-            if re.match(r'^\d+$', numberOrName):
+            if numberOrName.isdigit():
                 theClass = Classes.query.filter_by(number=numberOrName).first()
             else:
                 theClass = Classes.query.filter_by(name=numberOrName).first()   
