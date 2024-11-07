@@ -51,25 +51,17 @@ def check_time_conflict(student_id, new_class):
 def home():
     return render_template("home.html", user=current_user)
 
-@views.route("/search", methods=["GET", "POST"])
+@views.route("/search", methods=["GET"])
 def search():
     numberOrName = ""
-    theClass = None
-    if request.method == "POST":
-        numberOrName = request.form.get("search_query")
-        if(numberOrName):
-            if numberOrName.isdigit():
-                theClass = Classes.query.filter_by(number=numberOrName).first()
-            else:
-                theClass = Classes.query.filter_by(name=numberOrName).first()   
-
+    theClass = []
     if request.method == "GET":
         numberOrName = request.args.get("search_query", "")
         if(numberOrName):
             if numberOrName.isdigit():
-                theClass = Classes.query.filter_by(number=numberOrName).first()
+                theClass = Classes.query.filter_by(number=numberOrName).all()
             else:
-                theClass = Classes.query.filter_by(name=numberOrName).first() 
+                theClass = Classes.query.filter(Classes.name.like(f"%{numberOrName}%")).all()
 
     return render_template("search.html", theClass=theClass, numberOrName=numberOrName,user=current_user)
 
@@ -107,5 +99,6 @@ def add_class():
     db.session.commit()
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
+
 
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
