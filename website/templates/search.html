@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}課程查詢{% endblock %}
+{% block content %}
+
+
+<h1 align="center">課程查詢</h1>
+    <form method="GET" align="center">
+        <input type="text" name="search_query" placeholder="輸入課程名稱或代號" value="{{ numberOrName }}">
+        <button type="submit">查詢</button>
+    </form>
+
+    {% if theClass %}
+        <h2 align="center">課程資料:</h2>
+        <div style="display: flex; justify-content: center;">
+            <table border="1" style="border-collapse: collapse; width: 80%; font-size: 1.2em;">
+                <tr>
+                    <th style="padding: 10px; text-align: center;">課程代號</th>
+                    <th style="padding: 10px; text-align: center;">課程名稱</th>
+                    <th style="padding: 10px; text-align: center;">老師</th>
+                    <th style="padding: 10px; text-align: center;">教室</th>
+                    <th style="padding: 10px; text-align: center;">星期</th>
+                    <th style="padding: 10px; text-align: center;">節次</th>
+                    <th style="padding: 10px; text-align: center;">學分</th>
+                </tr>
+                {% for course in theClass %}
+                <tr>
+                    <td style="padding: 10px; text-align: center;">{{ course.number }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ course.name }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ course.teacher }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ course.classroom }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ course.date }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ course.time }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ course.credit }}</td>
+                    <td style="padding: 10px; text-align: center;">
+                        {% if current_user.is_authenticated %}
+                            <form action="{{ url_for('views.add_class') }}" method="POST" style="display: inline;">
+                                <input type="hidden" name="class_number" value="{{ course.number }}">
+                                <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
+                                <button type="submit">加入課程</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>    
+    {% elif numberOrName %}
+        <h2 align="center">查無此課程，請重新查詢</h2> 
+    {% endif %}
+
+{% endblock %}
