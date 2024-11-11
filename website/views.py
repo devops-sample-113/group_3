@@ -74,11 +74,12 @@ def timetable():
     
     return render_template('timetable.html', classes=classes, user = current_user)
 
-@views.route('/add_class', methods=["GET", "POST"])
+@views.route('/add_class/<number>', methods=["GET", "POST"])
 @login_required
-def add_class():
+def add_class(number):
     student_id = current_user.get_id()
-    class_number = request.form.get('class_number')
+    # class_number = request.form.get('class_number')
+    class_number = number
 
     can_add, message = can_add_course(student_id, class_number)
     if not can_add:
@@ -95,10 +96,31 @@ def add_class():
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
     new_enrollment = Enrollment(student_id=student_id, class_id=new_class.id)
+    current_user.enrollments.append(new_enrollment)
     db.session.add(new_enrollment)
     db.session.commit()
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
+
+
+    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+
+
+@views.route('/drop_class/<class_id>', methods=["GET", "POST"])
+@login_required
+def drop_class(class_id):
+    student_id = current_user.get_id()
+    current_credits = get_total_credits(student_id)
+    course = Classes.query.filter_by(id=class_id).first()
+
+
+    if 12 <= current_credits - course.credit:
+        course = Enrollment.query.filter_by(class_id=class_id, student_id=student_id).first()
+        
+        db.session.delete(course)
+        db.session.commit()
+
+
 
 
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))

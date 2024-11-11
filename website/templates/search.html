@@ -33,10 +33,12 @@
                     <td style="padding: 10px; text-align: center;">{{ course.credit }}</td>
                     <td style="padding: 10px; text-align: center;">
                         {% if current_user.is_authenticated %}
-                            <form action="{{ url_for('views.add_class') }}" method="POST" style="display: inline;">
+                            <form method="POST" style="display: inline;">
                                 <input type="hidden" name="class_number" value="{{ course.number }}">
                                 <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
-                                <button type="submit">加入課程</button>
+                                    <a href="/add_class/{{ course.number}}">加入課程</a>
+                                    <br>
+                                    <a href="/drop_class/{{ course.id }}">退選課程</a>
                             </form>
                         {% endif %}
                     </td>
