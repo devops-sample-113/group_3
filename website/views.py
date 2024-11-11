@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from .models import Student, Classes,Enrollment
+from .models import Student, Classes,Enrollment,Follow
 from . import db
 from datetime import datetime
 import os, sys, re
@@ -70,9 +70,12 @@ def search():
 def timetable():
     student_id = current_user.student_id
     enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+    follows = Follow.query.filter_by(student_id=student_id).all()
     classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
+    classes2 = [Follow.query.get(follow.class_id) for follow in follows]
     
-    return render_template('timetable.html', classes=classes, user = current_user)
+    
+    return render_template('timetable.html', classes=classes, user = current_user,classes2 = classes2)
 
 @views.route('/add_class/<number>', methods=["GET", "POST"])
 @login_required
@@ -121,6 +124,34 @@ def drop_class(class_id):
         db.session.commit()
 
 
+
+
+    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+@views.route('/follow', methods=["GET", "POST"])
+@login_required
+def follow():
+    student_id = current_user.get_id()
+    class_number = request.form.get('class_number')
+
+    can_add, message = can_add_course(student_id, class_number)
+    if not can_add:
+        flash(message, "danger")
+
+        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+
+    new_class = Classes.query.filter_by(number=class_number).first()
+
+    no_conflict, message = check_time_conflict(student_id, new_class)
+    if not no_conflict:
+        flash(message, "danger")
+
+        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+
+    follow = Follow(student_id=student_id, class_id=new_class.id)
+    db.session.add(follow)
+    db.session.commit()
+
+    flash(f"課程 {new_class.name} 已成功加入", "success")
 
 
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
