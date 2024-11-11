@@ -72,4 +72,15 @@ cur.executemany(
     "INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)", enrollments
 )
 
+follow = [
+    ( 1, 1),
+    ( 1, 2),
+    ( 2, 3),
+    ( 3, 4),
+    ( 3, 5),
+]
+cur.executemany(
+    "INSERT INTO follow (student_id, class_id) VALUES (?, ?)", follow
+)
+
 con.commit()

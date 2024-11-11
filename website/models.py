@@ -59,3 +59,17 @@ class Enrollment(db.Model, UserMixin):
 
     student = db.relationship('Student', backref='enrollments', lazy=True)
     classes = db.relationship('Classes', backref='enrollments', lazy=True)
+
+class Follow(db.Model, UserMixin):
+    __tablename__ = "follow"
+
+    def __init__(self, student_id, class_id):
+        self.student_id = student_id
+        self.class_id = class_id
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
+
+    student = db.relationship('Student', backref='follow', lazy=True)
+    classes = db.relationship('Classes', backref='follow', lazy=True)
