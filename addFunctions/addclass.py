@@ -5,7 +5,7 @@ from datetime import time
 con = sqlite3.connect("instance/database.db")
 cur = con.cursor()
 
-classes = [
+courses = [
     (
         1,
         "1234",
@@ -58,19 +58,19 @@ classes = [
     ),
 ]
 cur.executemany(
-    "INSERT INTO classes VALUES (?, ?, ?, ?, ?, ?, ?, ?)", classes
+    "INSERT INTO courses VALUES (?, ?, ?, ?, ?, ?, ?, ?)", courses
 )
 
-enrollments = [
-    ( 1, 1),
-    ( 1, 2),
-    ( 2, 3),
-    ( 3, 4),
-    ( 3, 5),
-]
-cur.executemany(
-    "INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)", enrollments
-)
+# enrollments = [
+#     ( 1, 1),
+#     ( 1, 2),
+#     ( 2, 3),
+#     ( 3, 4),
+#     ( 3, 5),
+# ]
+# cur.executemany(
+#     "INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)", enrollments
+# )
 
 follow = [
     ( 1, 1),
