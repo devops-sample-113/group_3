@@ -143,7 +143,7 @@ def follow(number):
     # class_number = request.form.get('class_number')
     class_number = number
 
-    can_add, message = follow_can_add_coursecan_add_course(student_id, class_number)
+    can_add, message = follow_can_add_course(student_id, class_number)
     if not can_add:
         flash(message, "danger")
 
