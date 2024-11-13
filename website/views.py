@@ -26,6 +26,14 @@ def can_add_course(student_id, new_class_id):
 
     return True, None
 
+def follow_can_add_course(student_id, new_class_id):
+    current_credits = get_total_credits(student_id)
+    new_class = Classes.query.filter_by(number=new_class_id).first()
+
+    new_class_credits = new_class.credit
+
+    return True, None
+
 def check_time_conflict(student_id, new_class):
     enrolled_classes = db.session.query(Classes).join(
         Enrollment, Classes.id == Enrollment.class_id
@@ -135,7 +143,7 @@ def follow(number):
     # class_number = request.form.get('class_number')
     class_number = number
 
-    can_add, message = can_add_course(student_id, class_number)
+    can_add, message = follow_can_add_coursecan_add_course(student_id, class_number)
     if not can_add:
         flash(message, "danger")
 
