@@ -37,10 +37,10 @@
                                 <input type="hidden" name="class_number" value="{{ course.number }}">
                                 <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
                                     {% if course in current_user.courses %}
-                                        <a href="/drop_class/{{ course.course_id }}">退選課程</a>
+                                        <a href="/drop_class/{{ course.course_id }}" class="btn btn-danger">退選課程</a>
                                     {% else %}
                                     <br>
-                                        <a href="/add_class/{{ course.number}}">加入課程</a>
+                                        <a href="/add_class/{{ course.number}}" class="btn btn-primary">加入課程</a>
                                     {% endif %}
                                 <button type="submit">加入課程</button>
                                 <button type="submit">關注</button>
