@@ -154,6 +154,7 @@ def follow(number):
     db.session.commit()
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
+    
 
 
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
