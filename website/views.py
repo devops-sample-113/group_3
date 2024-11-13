@@ -100,7 +100,7 @@ def add_class(number):
 
     no_conflict, message = check_time_conflict(student_id, new_class)
     if not no_conflict:
-        flash(message, "danger")
+        flash(message, "error")
 
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
@@ -137,11 +137,16 @@ def drop_class(class_id):
     return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
 
 
-@views.route('/follow', methods=["GET", "POST"])
+
+
+    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+
+@views.route('/follow/<number>', methods=["GET", "POST"])
 @login_required
-def follow():
+def follow(number):
     student_id = current_user.get_id()
-    class_number = request.form.get('class_number')
+    # class_number = request.form.get('class_number')
+    class_number = number
 
     can_add, message = can_add_course(student_id, class_number)
     if not can_add:
@@ -162,6 +167,7 @@ def follow():
     db.session.commit()
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
+    
 
 
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
