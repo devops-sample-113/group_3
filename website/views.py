@@ -26,13 +26,6 @@ def can_add_course(student_id, new_class_id):
 
     return True, None
 
-def follow_can_add_course(student_id, new_class_id):
-    current_credits = get_total_credits(student_id)
-    new_class = Classes.query.filter_by(number=new_class_id).first()
-
-    new_class_credits = new_class.credit
-
-    return True, None
 
 def check_time_conflict(student_id, new_class):
     enrolled_classes = db.session.query(Classes).join(
@@ -80,7 +73,7 @@ def timetable():
     enrollments = Enrollment.query.filter_by(student_id=student_id).all()
     follows = Follow.query.filter_by(student_id=student_id).all()
     classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
-    classes2 = [Follow.query.get(follow.class_id) for follow in follows]
+    classes2 = [Classes.query.get(follow.class_id) for follow in follows]
     
     
     return render_template('timetable.html', classes=classes, user = current_user,classes2 = classes2)
@@ -125,7 +118,7 @@ def drop_class(class_id):
     course = Classes.query.filter_by(id=class_id).first()
 
 
-    if 12 <= current_credits - course.credit:
+    if 1 <= current_credits - course.credit:
         course = Enrollment.query.filter_by(class_id=class_id, student_id=student_id).first()
         
         db.session.delete(course)
@@ -143,19 +136,10 @@ def follow(number):
     # class_number = request.form.get('class_number')
     class_number = number
 
-    can_add, message = follow_can_add_course(student_id, class_number)
-    if not can_add:
-        flash(message, "danger")
-
-        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    
 
     new_class = Classes.query.filter_by(number=class_number).first()
 
-    no_conflict, message = check_time_conflict(student_id, new_class)
-    if not no_conflict:
-        flash(message, "danger")
-
-        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
     follow = Follow(student_id=student_id, class_id=new_class.id)
     db.session.add(follow)
