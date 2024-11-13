@@ -111,9 +111,11 @@ def add_class(number):
     db.session.commit()
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
+    theClass = [new_enrollment]
 
 
-    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    # return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
 
 
 @views.route('/drop_class/<class_id>', methods=["GET", "POST"])
@@ -128,8 +130,11 @@ def drop_class(class_id):
         current_user.courses.remove(course)
         
         db.session.commit()
+    
+    theClass = [course]
 
-    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    # return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
 
 
 @views.route('/follow', methods=["GET", "POST"])
