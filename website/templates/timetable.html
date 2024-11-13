@@ -13,7 +13,7 @@
             <th style="padding: 10px; text-align: center;">節次</th>
             <th style="padding: 10px; text-align: center;">學分</th>
         </tr>
-        {% for class in classes %}
+        {% for class in current_user.courses %}
         <tr>
             <td style="padding: 10px; text-align: center;">{{ class.name }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.teacher }}</td>
@@ -38,7 +38,7 @@
             <th style="padding: 10px; text-align: center;">節次</th>
             <th style="padding: 10px; text-align: center;">學分</th>
         </tr>
-        {% for class in classes %}
+        {% for class in courses %}
         <tr>
             <td style="padding: 10px; text-align: center;">{{ class.name }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.teacher }}</td>
