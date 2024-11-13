@@ -94,7 +94,7 @@ def add_class(number):
 
     no_conflict, message = check_time_conflict(student_id, new_class)
     if not no_conflict:
-        flash(message, "danger")
+        flash(message, "error")
 
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
