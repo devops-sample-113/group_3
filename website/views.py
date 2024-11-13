@@ -127,11 +127,13 @@ def drop_class(class_id):
 
 
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
-@views.route('/follow', methods=["GET", "POST"])
+
+@views.route('/follow/<number>', methods=["GET", "POST"])
 @login_required
-def follow():
+def follow(number):
     student_id = current_user.get_id()
-    class_number = request.form.get('class_number')
+    # class_number = request.form.get('class_number')
+    class_number = number
 
     can_add, message = can_add_course(student_id, class_number)
     if not can_add:
