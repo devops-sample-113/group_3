@@ -28,6 +28,20 @@ def can_add_course(student_id, new_class_id):
         return False, "選課失敗：學分數超過25"
 
     return True, None
+def check_if_class_already_followed(student_id, class_id):
+    # 查詢學生是否已經在 Follow 表中關注了該課程
+    followed_class = db.session.query(Follow).filter(
+        Follow.student_id == student_id,
+        Follow.class_id == class_id
+    ).first()
+
+    # 如果找到了符合的紀錄，表示該學生已經關注過這堂課程
+    if followed_class:
+        return False, "關注失敗：該課程已經被關注"
+    
+    # 如果沒有找到，返回 True，表示可以進行關注
+    return True, None
+
 
 def check_time_conflict(student_id, new_class):
     # enrolled_classes = db.session.query(Classes).join(
@@ -148,26 +162,21 @@ def follow(number):
     # class_number = request.form.get('class_number')
     class_number = number
 
-    can_add, message = can_add_course(student_id, class_number)
-    if not can_add:
-        flash(message, "danger")
-
-        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    
 
     new_class = Course.query.filter_by(number=class_number).first()
 
-    no_conflict, message = check_time_conflict(student_id, new_class)
-    if not no_conflict:
+    can_follow, message = check_if_class_already_followed(student_id, new_class.id)
+    if not can_follow:
         flash(message, "danger")
-
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+
 
     follow = Follow(student_id=student_id, class_id=new_class.id)
     db.session.add(follow)
     db.session.commit()
 
-    flash(f"課程 {new_class.name} 已成功加入", "success")
-    
+    flash(f"課程 {new_class.name} 關注成功", "success")
 
 
     return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
