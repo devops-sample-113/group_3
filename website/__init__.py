@@ -11,7 +11,7 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
     db.init_app(app)
 
-    from .models import Student, Course,Enrollment, students_courses
+    from .models import Student, Course,Enrollment, students_courses, students_courses_follow
 
     with app.app_context():
         db.create_all()

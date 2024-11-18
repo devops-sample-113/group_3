@@ -42,7 +42,13 @@
                                     <br>
                                         <a href="/add_class/{{ course.number}}" class="btn btn-primary">加入課程</a>
                                     {% endif %}
-                                    <a href="/follow/{{ course.number}}" class="btn btn-primary">關注課程</a>
+                                    <br>
+                                    {% if course in current_user.follows %}
+                                        <a href="/unfollow/{{ course.course_id }}" class="btn btn-danger">取消關注課程</a>
+                                    {% else %}
+                                    <br>
+                                        <a href="/follow/{{ course.course_id}}" class="btn btn-primary">關注課程</a>
+                                    {% endif %}
                             </form>
                         {% endif %}
                     </td>

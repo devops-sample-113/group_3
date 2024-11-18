@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from .models import Student, Course,Enrollment,Follow
+from .models import Student, Course,Enrollment
 from . import db
 from datetime import datetime
 import os, sys, re
@@ -27,19 +27,6 @@ def can_add_course(student_id, new_class_id):
     if current_credits + new_class_credits > 25:
         return False, "選課失敗：學分數超過25"
 
-    return True, None
-def check_if_class_already_followed(student_id, class_id):
-    # 查詢學生是否已經在 Follow 表中關注了該課程
-    followed_class = db.session.query(Follow).filter(
-        Follow.student_id == student_id,
-        Follow.class_id == class_id
-    ).first()
-
-    # 如果找到了符合的紀錄，表示該學生已經關注過這堂課程
-    if followed_class:
-        return False, "關注失敗：該課程已經被關注"
-    
-    # 如果沒有找到，返回 True，表示可以進行關注
     return True, None
 
 
@@ -89,13 +76,11 @@ def search():
 def timetable():
     student_id = current_user.student_id
     # enrollments = Enrollment.query.filter_by(student_id=student_id).all()
-    follows = Follow.query.filter_by(student_id=student_id).all()
     # classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
-    classes2 = [Follow.query.get(follow.class_id) for follow in follows]
     
     
     # return render_template('timetable.html', classes=classes, user = current_user,classes2 = classes2)
-    return render_template('timetable.html', user = current_user,classes2 = classes2)
+    return render_template('timetable.html', user = current_user)
 
 @views.route('/add_class/<number>', methods=["GET", "POST"])
 @login_required
@@ -147,36 +132,34 @@ def drop_class(class_id):
     
     theClass = [course]
 
-    # return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
     return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
 
-
-
-
-    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
 @views.route('/follow/<number>', methods=["GET", "POST"])
 @login_required
 def follow(number):
-    student_id = current_user.get_id()
-    # class_number = request.form.get('class_number')
     class_number = number
+    course = Course.query.filter_by(course_id=class_number).first()
 
-    
-
-    new_class = Course.query.filter_by(number=class_number).first()
-
-    can_follow, message = check_if_class_already_followed(student_id, new_class.id)
-    if not can_follow:
-        flash(message, "danger")
-        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
-
-
-    follow = Follow(student_id=student_id, class_id=new_class.id)
-    db.session.add(follow)
+    current_user.follows.append(course)
     db.session.commit()
 
-    flash(f"課程 {new_class.name} 關注成功", "success")
+    flash(f"課程 {course.name} 關注成功", "success")
+    theClass = [course]
+
+    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
 
 
-    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+@views.route('/unfollow/<number>', methods=["GET", "POST"])
+@login_required
+def unfollow(number):
+    class_number = number
+    course = Course.query.filter_by(course_id=class_number).first()
+
+    current_user.follows.remove(course)
+    db.session.commit()
+
+    flash(f"課程 {course.name} 取消關注成功", "success")
+    theClass = [course]
+
+    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
