@@ -16,6 +16,7 @@
                 <tr>
                     <th style="padding: 10px; text-align: center;">課程代號</th>
                     <th style="padding: 10px; text-align: center;">課程名稱</th>
+                    <th style="padding: 10px; text-align: center;">課程大綱</th>
                     <th style="padding: 10px; text-align: center;">老師</th>
                     <th style="padding: 10px; text-align: center;">教室</th>
                     <th style="padding: 10px; text-align: center;">星期</th>
@@ -26,6 +27,9 @@
                 <tr>
                     <td style="padding: 10px; text-align: center;">{{ course.number }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.name }}</td>
+                    <td style="padding: 10px; text-align: center;">
+                        <a href="{{ course.outline }}" target="_blank">查看大綱</a>
+                    </td>
                     <td style="padding: 10px; text-align: center;">{{ course.teacher }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.classroom }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.date }}</td>
