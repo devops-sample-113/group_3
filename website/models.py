@@ -9,6 +9,12 @@ students_courses = db.Table(
     db.Column("course_id", db.Integer, db.ForeignKey("courses.course_id")),
 )
 
+students_courses_follow = db.Table(
+    "students_courses_follow",
+    db.Column("student_id", db.Integer, db.ForeignKey("students.student_id")),
+    db.Column("course_id", db.Integer, db.ForeignKey("courses.course_id")),
+)
+
 class Student(db.Model, UserMixin):
     __tablename__ = "students"
 
@@ -26,6 +32,7 @@ class Student(db.Model, UserMixin):
     password = db.Column(db.String(150))
 
     courses = db.relationship("Course", secondary=students_courses, backref="students")
+    follows = db.relationship("Course", secondary=students_courses_follow, backref="followers")
 
     def get_id(self):
         return (self.student_id)
@@ -78,16 +85,16 @@ class Enrollment(db.Model, UserMixin):
     student = db.relationship('Student', backref='enrollments', lazy=True)
     course = db.relationship('Course', backref='enrollments', lazy=True)
 
-class Follow(db.Model, UserMixin):
-    __tablename__ = "follow"
+# class Follow(db.Model, UserMixin):
+#     __tablename__ = "follow"
 
-    def __init__(self, student_id, class_id):
-        self.student_id = student_id
-        self.class_id = class_id
+#     def __init__(self, student_id, class_id):
+#         self.student_id = student_id
+#         self.class_id = class_id
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
-    class_id = db.Column(db.Integer, db.ForeignKey('courses.course_id'), nullable=False)
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
+#     class_id = db.Column(db.Integer, db.ForeignKey('courses.course_id'), nullable=False)
 
-    student = db.relationship('Student', backref='follow', lazy=True)
-    classes = db.relationship('Course', backref='follow', lazy=True)
+#     student = db.relationship('Student', backref='follow', lazy=True)
+#     classes = db.relationship('Course', backref='follow', lazy=True)
