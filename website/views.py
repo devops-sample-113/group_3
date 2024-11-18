@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from .models import Student, Classes,Enrollment,Follow
+from .models import Student, Course,Enrollment,Follow
 from . import db
 from datetime import datetime
 import os, sys, re
@@ -8,17 +8,20 @@ import os, sys, re
 views = Blueprint("views", __name__)
 
 def get_total_credits(student_id):
-    total_credits = db.session.query(
-        db.func.sum(Classes.credit)
-    ).join(Enrollment, Classes.id == Enrollment.class_id).filter(
-        Enrollment.student_id == student_id
-    ).scalar() or 0
+    # total_credits = db.session.query(
+    #     db.func.sum(Classes.credit)
+    # ).join(Enrollment, Classes.id == Enrollment.class_id).filter(
+    #     Enrollment.student_id == student_id
+    # ).scalar() or 0
+    total_credits = 0
+    for course in current_user.courses:
+        total_credits += course.credit
 
     return total_credits
 
 def can_add_course(student_id, new_class_id):
     current_credits = get_total_credits(student_id)
-    new_class = Classes.query.filter_by(number=new_class_id).first()
+    new_class = Course.query.filter_by(number=new_class_id).first()
 
     new_class_credits = new_class.credit
     if current_credits + new_class_credits > 25:
@@ -41,14 +44,16 @@ def check_if_class_already_followed(student_id, class_id):
 
 
 def check_time_conflict(student_id, new_class):
-    enrolled_classes = db.session.query(Classes).join(
-        Enrollment, Classes.id == Enrollment.class_id
-    ).filter(Enrollment.student_id == student_id).all()
+    # enrolled_classes = db.session.query(Classes).join(
+    #     Enrollment, Classes.id == Enrollment.class_id
+    # ).filter(Enrollment.student_id == student_id).all()
+
+    enrolled_courses = current_user.courses
 
     new_class_date = new_class.date
     new_class_time = new_class.time.split(',')
 
-    for enrolled_class in enrolled_classes:
+    for enrolled_class in enrolled_courses:
         if enrolled_class.date != new_class_date:
             continue
 
@@ -73,9 +78,9 @@ def search():
         numberOrName = request.args.get("search_query", "")
         if(numberOrName):
             if numberOrName.isdigit():
-                theClass = Classes.query.filter_by(number=numberOrName).all()
+                theClass = Course.query.filter_by(number=numberOrName).all()
             else:
-                theClass = Classes.query.filter(Classes.name.like(f"%{numberOrName}%")).all()
+                theClass = Course.query.filter(Course.name.like(f"%{numberOrName}%")).all()
 
     return render_template("search.html", theClass=theClass, numberOrName=numberOrName,user=current_user)
 
@@ -83,13 +88,14 @@ def search():
 @login_required
 def timetable():
     student_id = current_user.student_id
-    enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+    # enrollments = Enrollment.query.filter_by(student_id=student_id).all()
     follows = Follow.query.filter_by(student_id=student_id).all()
-    classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
-    classes2 = [Classes.query.get(follow.class_id) for follow in follows]
+    # classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
+    classes2 = [Follow.query.get(follow.class_id) for follow in follows]
     
     
-    return render_template('timetable.html', classes=classes, user = current_user,classes2 = classes2)
+    # return render_template('timetable.html', classes=classes, user = current_user,classes2 = classes2)
+    return render_template('timetable.html', user = current_user,classes2 = classes2)
 
 @views.route('/add_class/<number>', methods=["GET", "POST"])
 @login_required
@@ -104,7 +110,7 @@ def add_class(number):
 
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
-    new_class = Classes.query.filter_by(number=class_number).first()
+    new_class = Course.query.filter_by(number=class_number).first()
 
     no_conflict, message = check_time_conflict(student_id, new_class)
     if not no_conflict:
@@ -112,15 +118,18 @@ def add_class(number):
 
         return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
 
-    new_enrollment = Enrollment(student_id=student_id, class_id=new_class.id)
-    current_user.enrollments.append(new_enrollment)
-    db.session.add(new_enrollment)
+    # new_enrollment = Enrollment(student_id=student_id, class_id=new_class.id)
+    new_enrollment = Course.query.filter_by(number=class_number).first()
+    current_user.courses.append(new_enrollment)
+    # db.session.add(new_enrollment)
     db.session.commit()
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
+    theClass = [new_enrollment]
 
 
-    return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    # return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
 
 
 @views.route('/drop_class/<class_id>', methods=["GET", "POST"])
@@ -128,14 +137,18 @@ def add_class(number):
 def drop_class(class_id):
     student_id = current_user.get_id()
     current_credits = get_total_credits(student_id)
-    course = Classes.query.filter_by(id=class_id).first()
+    course = Course.query.filter_by(course_id=class_id).first()
 
-
-    if 1 <= current_credits - course.credit:
-        course = Enrollment.query.filter_by(class_id=class_id, student_id=student_id).first()
+    if 4 <= current_credits - course.credit:
+        course = Course.query.filter_by(course_id=class_id).first()
+        current_user.courses.remove(course)
         
-        db.session.delete(course)
         db.session.commit()
+    
+    theClass = [course]
+
+    # return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
 
 
 
@@ -151,7 +164,7 @@ def follow(number):
 
     
 
-    new_class = Classes.query.filter_by(number=class_number).first()
+    new_class = Course.query.filter_by(number=class_number).first()
 
     can_follow, message = check_if_class_already_followed(student_id, new_class.id)
     if not can_follow:

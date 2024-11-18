@@ -3,6 +3,12 @@ from . import db
 from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy
 
+students_courses = db.Table(
+    "students_courses",
+    db.Column("student_id", db.Integer, db.ForeignKey("students.student_id")),
+    db.Column("course_id", db.Integer, db.ForeignKey("courses.course_id")),
+)
+
 class Student(db.Model, UserMixin):
     __tablename__ = "students"
 
@@ -19,16 +25,21 @@ class Student(db.Model, UserMixin):
     name = db.Column(db.String(50))
     password = db.Column(db.String(150))
 
+    courses = db.relationship("Course", secondary=students_courses, backref="students")
+
+    def get_id(self):
+        return (self.student_id)
+
     def __repr__(self):
         return f"id: {self.student_id}, email: {self.account}, name: {self.name}"
 
-class Classes(db.Model, UserMixin):
-    __tablename__ = "classes"
+class Course(db.Model, UserMixin):
+    __tablename__ = "courses"
 
 
     def __init__(self, id, number, name, teacher, classroom, date, time, credit):
 
-        self.id = id
+        self.course_id = id
         self.number = number
         self.name = name
         self.teacher = teacher
@@ -37,7 +48,7 @@ class Classes(db.Model, UserMixin):
         self.time = time
         self.credit = credit
 
-    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     teacher = db.Column(db.String(50), nullable=False)
@@ -45,6 +56,11 @@ class Classes(db.Model, UserMixin):
     date = db.Column(db.String(50), nullable=False)
     time = db.Column(db.String(50), nullable=False)
     credit = db.Column(db.Integer, nullable=False)
+
+    def get_id(self):
+        return (self.course_id)
+
+    # students = db.relationship("Student", secondary=students_courses, backref="courses")
 
 class Enrollment(db.Model, UserMixin):
     __tablename__ = "enrollments"
@@ -55,10 +71,10 @@ class Enrollment(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
-    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('courses.course_id'), nullable=False)
 
     student = db.relationship('Student', backref='enrollments', lazy=True)
-    classes = db.relationship('Classes', backref='enrollments', lazy=True)
+    course = db.relationship('Course', backref='enrollments', lazy=True)
 
 class Follow(db.Model, UserMixin):
     __tablename__ = "follow"
@@ -69,7 +85,7 @@ class Follow(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
-    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('courses.course_id'), nullable=False)
 
     student = db.relationship('Student', backref='follow', lazy=True)
-    classes = db.relationship('Classes', backref='follow', lazy=True)
+    classes = db.relationship('Course', backref='follow', lazy=True)
