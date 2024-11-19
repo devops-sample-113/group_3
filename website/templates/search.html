@@ -4,7 +4,7 @@
 
 
 <h1 align="center">課程查詢</h1>
-    <form method="GET" align="center">
+    <form method="GET" action="{{ url_for('views.search') }}" align="center">
         <input type="text" name="search_query" placeholder="輸入課程名稱或代號" value="{{ numberOrName }}">
         <button type="submit">查詢</button>
     </form>
@@ -16,27 +16,25 @@
                 <tr>
                     <th style="padding: 10px; text-align: center;">課程代號</th>
                     <th style="padding: 10px; text-align: center;">課程名稱</th>
-                    <th style="padding: 10px; text-align: center;">課程大綱</th>
                     <th style="padding: 10px; text-align: center;">老師</th>
                     <th style="padding: 10px; text-align: center;">教室</th>
                     <th style="padding: 10px; text-align: center;">星期</th>
                     <th style="padding: 10px; text-align: center;">節次</th>
                     <th style="padding: 10px; text-align: center;">學分</th>
+                    <th style="padding: 10px; text-align: center;">餘額</th>
                 </tr>
                 {% for course in theClass %}
                 <tr>
                     <td style="padding: 10px; text-align: center;">{{ course.number }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.name }}</td>
-                    <td style="padding: 10px; text-align: center;">
-                        <a href="{{ course.outline }}" class="btn btn-primary">查看大綱</a>
-                    </td>
                     <td style="padding: 10px; text-align: center;">{{ course.teacher }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.classroom }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.date }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.time }}</td>
                     <td style="padding: 10px; text-align: center;">{{ course.credit }}</td>
+                    <td style="padding: 10px; text-align: center;">{{ course.remaining }}</td>
                     <td style="padding: 10px; text-align: center;">
-                        {% if current_user.is_authenticated %}
+                        <!-- {% if current_user.is_authenticated %}
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="class_number" value="{{ course.number }}">
                                 <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
@@ -54,11 +52,41 @@
                                         <a href="/follow/{{ course.course_id}}" class="btn btn-primary">關注課程</a>
                                     {% endif %}
                             </form>
+                        {% endif %} -->
+                        {% if current_user.is_authenticated %}
+                            {% if course in current_user.courses %}
+                                <form action="{{ url_for('views.drop_class') }}" method="POST">
+                                    <input type="hidden" name="class_id" value="{{ course.course_id }}">
+                                    <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
+                                    <button type="submit" align="center" class="btn btn-danger">退選課程</button>
+                                </form>
+                            {% else %}
+                                <br>
+                                <form action="{{ url_for('views.add_class') }}" method="POST">
+                                    <input type="hidden" name="class_number" value="{{ course.number }}">
+                                    <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
+                                    <button type="submit" align="center" class="btn btn-primary">加入課程</button>
+                                </form>
+                            {% endif %}
+                            {% if course in current_user.follows %}
+                                <form action="{{ url_for('views.unfollow') }}" method="POST">
+                                    <input type="hidden" name="class_number" value="{{ course.course_id }}">
+                                    <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
+                                    <button type="submit" align="center" class="btn btn-danger">取消關注課程</button>
+                                </form>
+                            {% else %}
+                                <br>
+                                <form action="{{ url_for('views.follow') }}" method="POST">
+                                    <input type="hidden" name="class_number" value="{{ course.course_id }}">
+                                    <input type="hidden" name="search_query" value="{{ numberOrName }}"> 
+                                    <button type="submit" align="center" class="btn btn-primary">關注課程</button>
+                                </form>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
-            </table>    
+            </table>
     {% elif numberOrName %}
         <h2 align="center">查無此課程，請重新查詢</h2> 
     {% endif %}
