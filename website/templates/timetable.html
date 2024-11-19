@@ -3,9 +3,15 @@
 {% block content %}
 
 <h1 align="center">你的課表</h1>
+
+<div style="text-align: right;position: relative; left: -7em; margin-bottom: 20px;font-size: 1.5em; font-weight: bold;">
+    <strong>已選學分數: {{ total_credit }}</strong>
+</div>
+
 <div style="display: flex; justify-content: center;">
     <table border="1" style="border-collapse: collapse; width: 80%; font-size: 1.2em;">
         <tr>
+            <th style="padding: 10px; text-align: center;">選課代碼</th>
             <th style="padding: 10px; text-align: center;">課程名稱</th>
             <th style="padding: 10px; text-align: center;">老師</th>
             <th style="padding: 10px; text-align: center;">教室</th>
@@ -15,6 +21,7 @@
         </tr>
         {% for class in current_user.courses %}
         <tr>
+            <td style="padding: 10px; text-align: center;">{{ class.number }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.name }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.teacher }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.classroom }}</td>
@@ -31,6 +38,7 @@
 <div style="display: flex; justify-content: center;">
     <table border="1" style="border-collapse: collapse; width: 80%; font-size: 1.2em;">
         <tr>
+            <th style="padding: 10px; text-align: center;">選課代碼</th>
             <th style="padding: 10px; text-align: center;">課程名稱</th>
             <th style="padding: 10px; text-align: center;">老師</th>
             <th style="padding: 10px; text-align: center;">教室</th>
@@ -40,6 +48,7 @@
         </tr>
         {% for class in current_user.follows %}
         <tr>
+            <td style="padding: 10px; text-align: center;">{{ class.number }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.name }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.teacher }}</td>
             <td style="padding: 10px; text-align: center;">{{ class.classroom }}</td>

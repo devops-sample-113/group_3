@@ -44,7 +44,7 @@ class Course(db.Model, UserMixin):
     __tablename__ = "courses"
 
 
-    def __init__(self, id, number, name, teacher, classroom, date, time, credit,outline,remaining):
+    def __init__(self, id, number, name, teacher, classroom, date, time, credit,remaining):
 
         self.course_id = id
         self.number = number
@@ -54,7 +54,6 @@ class Course(db.Model, UserMixin):
         self.date = date
         self.time = time
         self.credit = credit
-        self.outline = outline
         self.remaining = remaining
 
     course_id = db.Column(db.Integer, primary_key=True)
@@ -65,7 +64,6 @@ class Course(db.Model, UserMixin):
     date = db.Column(db.String(50), nullable=False)
     time = db.Column(db.String(50), nullable=False)
     credit = db.Column(db.Integer, nullable=False)
-    outline = db.Column(db.String(500), nullable=False)
     remaining = db.Column(db.Integer, nullable=False)
 
     def get_id(self):

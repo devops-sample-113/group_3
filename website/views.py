@@ -86,7 +86,8 @@ def timetable():
     # enrollments = Enrollment.query.filter_by(student_id=student_id).all()
     # classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
     # return render_template('timetable.html', classes=classes, user = current_user,classes2 = classes2)
-    return render_template('timetable.html', user = current_user)
+    total_credits = sum(course.credit for course in current_user.courses)
+    return render_template('timetable.html', user = current_user,total_credit = total_credits)
 
 @views.route('/add_class', methods=["POST"])
 @login_required
@@ -99,7 +100,7 @@ def add_class():
 
     can_add, message = can_add_course(student_id, class_number)
     if not can_add:
-        flash(message, "danger")
+        flash(message, "error")
 
         return render_template("search.html", theClass=[new_class], numberOrName="",user=current_user)
 
