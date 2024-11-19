@@ -49,7 +49,15 @@ def check_time_conflict(student_id, new_class):
         for time in new_class_time:
             if time in enrolled_class_time:
                 return False, f"選課失敗：欲加選課程與 {enrolled_class.name} 課程在星期 {new_class_date} 節次 {time} 衝堂"
-    
+
+    return True, None
+
+def check_remaining(student_id, new_class_id):
+    new_class = Course.query.filter_by(number=new_class_id).first()
+
+    if new_class.remaining<=0:
+        return False, "選課失敗，餘額不足"
+
     return True, None
 
 @views.route("/")
@@ -77,31 +85,35 @@ def timetable():
     student_id = current_user.student_id
     # enrollments = Enrollment.query.filter_by(student_id=student_id).all()
     # classes = [Classes.query.get(enrollment.class_id) for enrollment in enrollments]
-    
-    
     # return render_template('timetable.html', classes=classes, user = current_user,classes2 = classes2)
     return render_template('timetable.html', user = current_user)
 
-@views.route('/add_class/<number>', methods=["GET", "POST"])
+@views.route('/add_class', methods=["POST"])
 @login_required
-def add_class(number):
+def add_class():
     student_id = current_user.get_id()
-    # class_number = request.form.get('class_number')
-    class_number = number
+    class_number = request.form.get('class_number')
+    # class_number = number
+
+    new_class = Course.query.filter_by(number=class_number).first()
 
     can_add, message = can_add_course(student_id, class_number)
     if not can_add:
         flash(message, "danger")
 
-        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
-
-    new_class = Course.query.filter_by(number=class_number).first()
+        return render_template("search.html", theClass=[new_class], numberOrName="",user=current_user)
 
     no_conflict, message = check_time_conflict(student_id, new_class)
     if not no_conflict:
         flash(message, "error")
 
-        return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
+        return render_template("search.html", theClass=[new_class], numberOrName="",user=current_user)
+
+    has_remaining, message = check_remaining(student_id, class_number)
+    if not has_remaining:
+        flash(message, "error")
+
+        return render_template("search.html", theClass=[new_class], numberOrName="",user=current_user)
 
     # new_enrollment = Enrollment(student_id=student_id, class_id=new_class.id)
     new_enrollment = Course.query.filter_by(number=class_number).first()
@@ -111,15 +123,18 @@ def add_class(number):
 
     flash(f"課程 {new_class.name} 已成功加入", "success")
     theClass = [new_enrollment]
+    new_class.remaining -= 1
+    db.session.commit()
 
 
     # return redirect(url_for('views.search', search_query=request.form.get('search_query', '')))
-    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
+    return render_template("search.html", theClass=theClass, numberOrName="",user=current_user)
 
 
-@views.route('/drop_class/<class_id>', methods=["GET", "POST"])
+@views.route('/drop_class', methods=[ "POST"])
 @login_required
-def drop_class(class_id):
+def drop_class():
+    class_id = request.form.get('class_id')
     student_id = current_user.get_id()
     current_credits = get_total_credits(student_id)
     course = Course.query.filter_by(course_id=class_id).first()
@@ -127,18 +142,18 @@ def drop_class(class_id):
     if 4 <= current_credits - course.credit:
         course = Course.query.filter_by(course_id=class_id).first()
         current_user.courses.remove(course)
-        
+        course.remaining +=1
         db.session.commit()
-    
     theClass = [course]
 
-    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
+    return render_template("search.html", theClass=theClass, numberOrName="",user=current_user)
 
 
-@views.route('/follow/<number>', methods=["GET", "POST"])
+@views.route('/follow', methods=[ "POST"])
 @login_required
-def follow(number):
-    class_number = number
+def follow():
+    # class_number = number
+    class_number = request.form.get('class_number')
     course = Course.query.filter_by(course_id=class_number).first()
 
     current_user.follows.append(course)
@@ -147,13 +162,14 @@ def follow(number):
     flash(f"課程 {course.name} 關注成功", "success")
     theClass = [course]
 
-    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
+    return render_template("search.html", theClass=theClass, numberOrName="",user=current_user)
 
 
-@views.route('/unfollow/<number>', methods=["GET", "POST"])
+@views.route('/unfollow', methods=["POST"])
 @login_required
-def unfollow(number):
-    class_number = number
+def unfollow():
+    # class_number = number
+    class_number = request.form.get('class_number')
     course = Course.query.filter_by(course_id=class_number).first()
 
     current_user.follows.remove(course)
@@ -162,4 +178,4 @@ def unfollow(number):
     flash(f"課程 {course.name} 取消關注成功", "success")
     theClass = [course]
 
-    return render_template("search.html", theClass=theClass, numberOrName=None,user=current_user)
+    return render_template("search.html", theClass=theClass, numberOrName="",user=current_user)
