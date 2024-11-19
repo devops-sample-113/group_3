@@ -68,6 +68,7 @@
                                     <button type="submit" align="center" class="btn btn-primary">加入課程</button>
                                 </form>
                             {% endif %}
+                            <br>
                             {% if course in current_user.follows %}
                                 <form action="{{ url_for('views.unfollow') }}" method="POST">
                                     <input type="hidden" name="class_number" value="{{ course.course_id }}">
@@ -88,7 +89,7 @@
                 {% endfor %}
             </table>
     {% elif numberOrName %}
-        <h2 align="center">查無此課程，請重新查詢</h2> 
+        <h2 align="center">查無此課程，請重新查詢</h2>
     {% endif %}
 
 {% endblock %}
