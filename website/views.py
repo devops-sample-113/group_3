@@ -144,6 +144,10 @@ def drop_class():
         current_user.courses.remove(course)
         course.remaining +=1
         db.session.commit()
+        flash("退選成功", "success")
+
+    if current_credits - course.credit < 4:
+        flash("退選失敗(學分不得低於4)", "error")
     theClass = [course]
 
     return render_template("search.html", theClass=theClass, numberOrName="",user=current_user)
