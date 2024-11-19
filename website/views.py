@@ -129,6 +129,10 @@ def drop_class(class_id):
         current_user.courses.remove(course)
         
         db.session.commit()
+        flash("退選成功", "success")
+    
+    if current_credits - course.credit < 4:
+        flash("退選失敗(學分不得低於4)", "error")
     
     theClass = [course]
 
